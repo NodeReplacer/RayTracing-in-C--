@@ -1,5 +1,7 @@
 # Summary
 
+![image](https://github.com/NodeReplacer/RayTracing-in-C--/assets/80176553/4af260f0-2a74-40f7-a0aa-e1a52329a1f1)
+
 Exploring raytracing (pathtracing actually) in C++. The language doesn't matter so much as the 3D math does, which I found more important.
 
 # USAGE 
