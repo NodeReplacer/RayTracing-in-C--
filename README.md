@@ -1,3 +1,7 @@
+# Summary
+
+Exploring raytracing (pathtracing actually) in C++. The language doesn't matter so much as the 3D math does, which I found more important.
+
 # USAGE 
 
 The C++ program outputs the image to cout as text. Furthermore it is in .ppm format.
