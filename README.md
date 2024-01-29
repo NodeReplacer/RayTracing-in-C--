@@ -4,7 +4,9 @@ The C++ program outputs the image to cout as text. Furthermore it is in .ppm for
 
 Therefore, the output must be piped to a .ppm file. For example: ./RayTracing.exe > image.ppm
 
-PPM viewers can be downloaded or even used online. If you don't want to download a new program here is a link to an online PPM viewer: https://www.cs.rhodes.edu/welshc/COMP141_F16/ppmReader.html
+PPM viewers can be downloaded or even used online. 
+
+If you don't want to download a new program here is a link to an online PPM viewer: https://www.cs.rhodes.edu/welshc/COMP141_F16/ppmReader.html
 
 # Performance
 
