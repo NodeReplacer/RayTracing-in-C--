@@ -7,6 +7,15 @@
 #include "sphere.h"
 
 #include <iostream>
+#include <vector>
+#include <future>
+
+int process(int value) {
+    // Perform some computation or task
+    // For simplicity, just square the input value
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000  ));
+    return value * value;
+}
 
 int main() {
 
@@ -68,8 +77,8 @@ int main() {
     camera cam;
 
     cam.aspect_ratio      = 16.0 / 9.0;
-    cam.image_width       = 1280;
-    cam.samples_per_pixel = 500;
+    cam.image_width       = 400;
+    cam.samples_per_pixel = 20;
     cam.max_depth         = 50;
 
     cam.vfov     = 20;
@@ -80,5 +89,26 @@ int main() {
     cam.defocus_angle = 0.6;
     cam.focus_dist    = 10.0;
     
-    cam.render(world);
+    //render - No async used. The for loop colors lines one by one.
+    //render2 - Async (and therefore multiple threads) used. No limit to CPU usage. You WILL max out all your cores if use this method. Though it is fast.
+    //render3 - To Be Created. Divide the jobs into a limited number of batches. Give each their own thread. Won't be as fast as render2 but will give the CPU
+    //          some rest.
+    cam.render2(world);
+    
+    /*
+    //Testing how async and (hopefully) multithreading works.
+    const int numTasks = 20;
+    std::vector<std::future<int>> futures;
+    
+    for (int i = 0; i < numTasks; ++i) {
+        // Using std::async to launch a task asynchronously
+        futures.push_back(std::async(std::launch::async, process, i));
+    }
+    
+    // Wait for each task to complete and get the result in order
+    for (int i = 0; i < numTasks; ++i) {
+        int result = futures[i].get();
+        std::cout << "Result for task " << i << ": " << result << std::endl;
+    }
+    */
 }

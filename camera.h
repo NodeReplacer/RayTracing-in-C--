@@ -6,8 +6,17 @@
 #include "color.h"
 #include "hittable.h"
 #include "material.h"
+#include "parallel.h"
 
 #include <iostream>
+#include <thread>
+#include <vector>
+#include <future>
+
+#define PARALLEL_FOR_BEGIN(nb_elements) parallel_for(nb_elements, [&](int start, int end){ for(int i = start; i < end; ++i)
+#define PARALLEL_FOR_END()})
+
+int progress;
 
 class camera {
 public:
@@ -18,7 +27,7 @@ public:
     int image_width = 256;
     int image_height = 256;
     */
-
+    
     //And here it is, our new image dimensions.
     //I do like the fact that organizing them like this makes it immediately apparent this is a list of features.
     //I can use this for formatting later.
@@ -38,7 +47,61 @@ public:
     double focus_dist = 10;    // Distance from camera position point to distance where focus is perfect.
     
     //But if they aren't overwritten then the program won't explode.
-
+    
+    std::string renderLine(int image_width, int samples_per_pixel, const hittable& world, int j) {
+        std::string coloredLine;
+        
+        for (int i = 0; i < image_width; ++i) {
+            color pixel_color(0,0,0); //Base pixel color of 'no values'.
+            for (int sample = 0; sample < samples_per_pixel; ++sample) {
+                //Default sample size is set in int main() for now. But there is a default value for samples_per_pixel
+                ray r = get_ray(i, j);
+                pixel_color += ray_color(r, max_depth, world);
+            }
+            coloredLine.append(async_write_color(pixel_color, samples_per_pixel));
+        }
+        //Probably should sink this. The clog happens asynchronously so it won't really help track the progress to the user
+        //but the user probably needs this just to know that something is happening behind the hood.
+        std::clog << "\rScanlines remaining: " << --progress << ' ' << std::flush;
+        return coloredLine;
+    }
+    
+    void render2(const hittable& world) {
+        initialize();
+        
+        std::vector<std::future<std::string>> futures;
+        progress = image_height; //Progress indicator for async to display progress to the user. 
+        // Render
+        //PPM image header - This header is ID. Tells programs what kind of file it is (ppm in our case).
+        std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+        
+        for (int j = 0; j < image_height; ++j) {
+            //Progress marker
+            //std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
+            futures.push_back(std::async(std::launch::async, &camera::renderLine, this, image_width, samples_per_pixel, std::cref(world), j));
+            //renderLine(image_width,samples_per_pixel,world,j);
+            //Do it line by line and make sure each line returns in the correct order.
+            //futures.push_back(std::async(std::launch::async, &camera::renderLine, image_width, samples_per_pixel, world, j));
+            /*
+            for (int i = 0; i < image_width; ++i) {
+                color pixel_color(0,0,0); //Base pixel color of 'no values'.
+                for (int sample = 0; sample < samples_per_pixel; ++sample) {
+                    //Default sample size is set in int main() for now. But there is a default value for samples_per_pixel
+                    ray r = get_ray(i, j);
+                    pixel_color += ray_color(r, max_depth, world);
+                }
+                write_color(std::cout, pixel_color, samples_per_pixel);
+            }
+            */
+        }
+        for (auto& jobList : futures) {
+            std::string result = jobList.get();
+            //std::clog << "Job List\n";
+            std::cout << result;
+        }
+        std::clog << "\rDone. Used render2                 \n"; 
+    }
+    
     void render(const hittable& world) {
         initialize();
         
@@ -49,6 +112,7 @@ public:
         for (int j = 0; j < image_height; ++j) {
             //Progress marker
             std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
+            
             for (int i = 0; i < image_width; ++i) {
                 /*
                 // Our very beginning picture colorer. Before we migrated all of the necessary parts to vec3.h and color.h.
@@ -71,10 +135,9 @@ public:
                     pixel_color += ray_color(r, max_depth, world);
                 }
                 write_color(std::cout, pixel_color, samples_per_pixel);
-                
             }
         }
-        std::clog << "\rDone.                 \n";
+        std::clog << "\rDone. Used render1                 \n";
     }
 
 private:
