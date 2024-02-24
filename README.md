@@ -19,3 +19,7 @@ If you don't want to download a new program here is a link to an online PPM view
 The performance gets poorer the higher the cam.samples_per_pixel and cam.max_depth values go. Samples_per_pixel is done for anti-aliasing and depth refers to how many bounces the rays can perform before we just tell it to stop.
 
 Currently the values are very high and that's because I was trying to render an impressive looking scene to show off, but it took about 7 hours because the program does not take up all of your CPU cycles generating the scene. And it shouldn't.
+
+# HOWEVER
+
+With the creation of (currently named) render2. The program will take up all of your CPU rendering the image. It multithreads but it does a lot more than that now. As such, the program now only renders a comparatively tiny image at low sample size and depth.
