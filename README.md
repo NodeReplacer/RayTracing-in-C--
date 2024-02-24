@@ -14,6 +14,8 @@ PPM viewers can be downloaded or even used online.
 
 If you don't want to download a new program here is a link to an online PPM viewer: https://www.cs.rhodes.edu/welshc/COMP141_F16/ppmReader.html
 
+Note: Windows powershell outputs text in UTF-16, which WILL cause some issue with most ppm files. The normal cmd.exe program outputs it just fine so that can be used instead. Also the website linked can handle the distinction with no issue but if you want to keep the testing all offline then make sure that the program is run in something that outputs to ASCII or UTF-8. 
+
 # Performance
 
 The performance gets poorer the higher the cam.samples_per_pixel and cam.max_depth values go. Samples_per_pixel is done for anti-aliasing and depth refers to how many bounces the rays can perform before we just tell it to stop.
