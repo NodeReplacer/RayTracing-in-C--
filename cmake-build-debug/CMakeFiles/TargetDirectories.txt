@@ -1,3 +1,0 @@
-G:/Personal Projects/C++ Projects/RayTracing/cmake-build-debug/CMakeFiles/RayTracing.dir
-G:/Personal Projects/C++ Projects/RayTracing/cmake-build-debug/CMakeFiles/edit_cache.dir
-G:/Personal Projects/C++ Projects/RayTracing/cmake-build-debug/CMakeFiles/rebuild_cache.dir
