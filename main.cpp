@@ -93,22 +93,9 @@ int main() {
     //render2 - Async (and therefore multiple threads) used. No limit to CPU usage. You WILL max out all your cores if use this method. Though it is fast.
     //render3 - To Be Created. Divide the jobs into a limited number of batches. Give each their own thread. Won't be as fast as render2 but will give the CPU
     //          some rest.
-    cam.render2(world);
     
-    /*
-    //Testing how async and (hopefully) multithreading works.
-    const int numTasks = 20;
-    std::vector<std::future<int>> futures;
+    cam.render2(world); //render2 is asynchronously multi-threaded. It will max out your CPU on all cores as it did mine.
+                        //I was planning on dividing the image into jobs and creating a limited number of threads to handle
+                        //it, but haven't gotten around to it yet. It would be easy though.
     
-    for (int i = 0; i < numTasks; ++i) {
-        // Using std::async to launch a task asynchronously
-        futures.push_back(std::async(std::launch::async, process, i));
-    }
-    
-    // Wait for each task to complete and get the result in order
-    for (int i = 0; i < numTasks; ++i) {
-        int result = futures[i].get();
-        std::cout << "Result for task " << i << ": " << result << std::endl;
-    }
-    */
 }

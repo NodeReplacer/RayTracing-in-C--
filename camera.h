@@ -48,21 +48,24 @@ public:
     
     //But if they aren't overwritten then the program won't explode.
     
+    //render2 uses renderLine.
     std::string renderLine(int image_width, int samples_per_pixel, const hittable& world, int j) {
         std::string coloredLine;
         
         for (int i = 0; i < image_width; ++i) {
             color pixel_color(0,0,0); //Base pixel color of 'no values'.
-            for (int sample = 0; sample < samples_per_pixel; ++sample) {
-                //Default sample size is set in int main() for now. But there is a default value for samples_per_pixel
+            for (int sample = 0; sample < samples_per_pixel; ++sample) { //multi-sample for anti-aliasing.
+                //Default sample size "samples_per_pixel" is set in int main() of main.cpp but there is a default value 
+                // "10" stored here in camera.h in case that is forgotten.
                 ray r = get_ray(i, j);
                 pixel_color += ray_color(r, max_depth, world);
             }
             coloredLine.append(async_write_color(pixel_color, samples_per_pixel));
         }
-        //Probably should sink this. The clog happens asynchronously so it won't really help track the progress to the user
-        //but the user probably needs this just to know that something is happening behind the hood.
-        std::clog << "\rScanlines remaining: " << --progress << ' ' << std::flush;
+        //Keeping tabs on progress. The number is a mess and I should probably discard this, but I tried to run this without
+        // a progress tracker and staring at a blank command prompt wondering if the program is even responding is
+        // even worse than having a nonsense number.
+        std::clog << "\rScanlines remaining: " << --progress << ' ' << std::flush; //This function is run asynchronously so this messes up.
         return coloredLine;
     }
     
@@ -72,27 +75,14 @@ public:
         std::vector<std::future<std::string>> futures;
         progress = image_height; //Progress indicator for async to display progress to the user. 
         // Render
-        //PPM image header - This header is ID. Tells programs what kind of file it is (ppm in our case).
+        //PPM image header - This header is ID. It tells programs what kind of file it is (ppm in our case).
         std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
         
         for (int j = 0; j < image_height; ++j) {
             //Progress marker
             //std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
             futures.push_back(std::async(std::launch::async, &camera::renderLine, this, image_width, samples_per_pixel, std::cref(world), j));
-            //renderLine(image_width,samples_per_pixel,world,j);
             //Do it line by line and make sure each line returns in the correct order.
-            //futures.push_back(std::async(std::launch::async, &camera::renderLine, image_width, samples_per_pixel, world, j));
-            /*
-            for (int i = 0; i < image_width; ++i) {
-                color pixel_color(0,0,0); //Base pixel color of 'no values'.
-                for (int sample = 0; sample < samples_per_pixel; ++sample) {
-                    //Default sample size is set in int main() for now. But there is a default value for samples_per_pixel
-                    ray r = get_ray(i, j);
-                    pixel_color += ray_color(r, max_depth, world);
-                }
-                write_color(std::cout, pixel_color, samples_per_pixel);
-            }
-            */
         }
         for (auto& jobList : futures) {
             std::string result = jobList.get();
@@ -102,6 +92,7 @@ public:
         std::clog << "\rDone. Used render2                 \n"; 
     }
     
+    //This function does not use renderLine. Because renderLine is mea
     void render(const hittable& world) {
         initialize();
         
@@ -115,7 +106,7 @@ public:
             
             for (int i = 0; i < image_width; ++i) {
                 /*
-                // Our very beginning picture colorer. Before we migrated all of the necessary parts to vec3.h and color.h.
+                // Our very beginning picture colorer kept as historical record. Before we migrated all of the necessary parts to vec3.h and color.h.
                 // Without them we write to the file correctly but don't store anything in the program except for the file
                 // So if we wanted to do anything else to the picture we wouldn't be able to without hard coding it right here.
                 auto r = double(i) / (image_width-1);
