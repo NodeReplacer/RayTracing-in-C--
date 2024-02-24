@@ -22,4 +22,6 @@ Currently the values are very high and that's because I was trying to render an 
 
 # HOWEVER
 
-With the creation of (currently named) render2. The program will take up all of your CPU rendering the image. It multithreads but it does a lot more than that now. As such, the program now only renders a comparatively tiny image at low sample size and depth.
+With the creation of (currently named) render2. The program will take up all of your CPU rendering the image. It multithreads but it does a lot more than that now. As such, the program now only renders a tiny image at low sample size and depth.
+
+Turn those numbers up at your own risk.
